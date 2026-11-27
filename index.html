@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hamza Job Fit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* layout: input and records on the left, work on the right; one column at phone width */
+  --bg:#f4f6f5; --panel:#ffffff; --ink:#1b2321; --muted:#5d6b67; --line:#d9dfdc;
+  --accent:#0e6b5e; --accent-ink:#ffffff; --soft:#e3f0ec;
+  --good:#1f7a3a; --warn:#b26a00; --bad:#b3261e; --good-bg:#e6f4ea; --warn-bg:#fff3df; --bad-bg:#fde8e6;
+  --display:"Sora",system-ui,sans-serif; --body:"Source Sans 3",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121817; --panel:#1a2322; --ink:#e8edeb; --muted:#9fb0ab; --line:#2c3a37;
+    --accent:#5fc4b0; --accent-ink:#0d1715; --soft:#1f322e;
+    --good:#7bd38f; --warn:#f2b55a; --bad:#f39b94; --good-bg:#1a2f21; --warn-bg:#33270f; --bad-bg:#3a1e1b;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121817; --panel:#1a2322; --ink:#e8edeb; --muted:#9fb0ab; --line:#2c3a37;
+  --accent:#5fc4b0; --accent-ink:#0d1715; --soft:#1f322e;
+  --good:#7bd38f; --warn:#f2b55a; --bad:#f39b94; --good-bg:#1a2f21; --warn-bg:#33270f; --bad-bg:#3a1e1b;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+header{padding:20px 16px 8px;max-width:1280px;margin:0 auto}
+h1{font-family:var(--display);font-size:22px;margin:0;font-weight:600;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted)}
+main{max-width:1280px;margin:0 auto;padding:8px 16px 48px;display:grid;grid-template-columns:minmax(300px,400px) 1fr;gap:20px;align-items:start}
+@media (max-width:880px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+.panel h2{font-family:var(--display);font-size:15px;font-weight:600;margin:0 0 10px}
+h2.sub{margin-top:16px}
+label{display:block;font-weight:600;font-size:14px;margin:10px 0 4px}
+input[type=text],textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+textarea{min-height:200px;resize:vertical}
+textarea.short{min-height:60px}
+input:focus,textarea:focus,select:focus,button:focus-visible,[contenteditable]:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.row > *{flex:1 1 140px}
+.check{display:flex;gap:8px;align-items:center;font-weight:600;font-size:14px;margin-top:10px}
+.check input{width:18px;height:18px;margin:0}
+button{font:inherit;font-weight:600;border-radius:6px;padding:9px 14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.small{padding:3px 9px;font-size:13px}
+button:disabled{opacity:.5;cursor:default}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.stack{display:grid;gap:16px}
+.score{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+.ring{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:26px;font-weight:700;background:conic-gradient(var(--ring-color,var(--accent)) calc(var(--pct,0)*1%),var(--line) 0);position:relative}
+.ring::after{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--panel)}
+.ring span{position:relative;z-index:1;font-variant-numeric:tabular-nums}
+.verdict{font-family:var(--display);font-size:16px;font-weight:600}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:13px;font-weight:600;margin:3px 4px 3px 0;border:1px solid transparent;white-space:nowrap}
+.pill.good{background:var(--good-bg);color:var(--good)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.grey{background:var(--bg);color:var(--muted);border-color:var(--line)}
+table.req{width:100%;border-collapse:collapse;font-size:14px}
+table.req th,table.req td{text-align:left;vertical-align:top;padding:6px 8px 6px 0;border-top:1px solid var(--line)}
+table.req th{border-top:0;font-size:13px;color:var(--muted);font-weight:600}
+table.req td:first-child{width:38%}
+.q{border-top:1px solid var(--line);padding:10px 0}
+.q:first-child{border-top:0}
+.q p{margin:0 0 6px}
+.q small{color:var(--muted)}
+.q .opts{display:flex;gap:14px;flex-wrap:wrap;margin:4px 0 6px;font-size:14px}
+.q .opts label{display:inline-flex;gap:5px;align-items:center;margin:0;font-weight:500}
+.q textarea{min-height:52px}
+.status{font-size:14px;color:var(--muted);margin-top:8px;min-height:20px}
+.status.err{color:var(--bad)}
+.cv{font-family:"Source Sans 3",Arial,sans-serif;background:#fff;color:#111;border:1px solid var(--line);padding:28px 32px;border-radius:6px;max-width:760px;line-height:1.35}
+.cv h3{font-size:20px;margin:0 0 2px;letter-spacing:.5px}
+.cv .head{font-size:14px;color:#333;margin:0 0 2px}
+.cv .contact{font-size:13px;color:#444;margin:0 0 12px}
+.cv h4{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;border-bottom:1px solid #999;margin:14px 0 6px;padding-bottom:2px}
+.cv .job{margin:8px 0 2px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.cv .job b{font-size:14px}
+.cv .job span{font-size:13px;color:#444;white-space:nowrap}
+.cv .org{font-size:13px;color:#333;margin:0 0 3px}
+.cv ul{margin:0 0 4px;padding-left:18px;font-size:13.5px}
+.cv ul li{margin:2px 0}
+.cv p{font-size:13.5px;margin:4px 0}
+.cv [contenteditable]{border-bottom:1px dashed transparent;padding:0 2px;border-radius:2px}
+.cv [contenteditable]:hover{border-bottom-color:#9bbfb7;background:#f3faf8}
+.cv li.flag{background:#fff6e5}
+.doc{white-space:pre-wrap;font-size:14.5px;line-height:1.5;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:14px;font-family:var(--body)}
+.doc.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+details{border-top:1px solid var(--line);padding:8px 0}
+summary{cursor:pointer;font-weight:600}
+.hist{font-size:14px}
+.hist .app{display:grid;grid-template-columns:1fr auto;gap:6px 10px;padding:8px 0;border-top:1px solid var(--line);align-items:center}
+.hist .app:first-child{border-top:0}
+.hist .app select{padding:3px 6px;font-size:13px;width:auto}
+.hist .app small{color:var(--muted);grid-column:1/-1}
+.muted{color:var(--muted);font-size:14px}
+.hidden{display:none}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tabs button[aria-selected="true"]{background:var(--soft);border-color:var(--accent);color:var(--accent)}
+.change{border-top:1px solid var(--line);padding:8px 0;font-size:14.5px}
+.change:first-child{border-top:0}
+.change b{display:block}
+.change small{color:var(--muted);display:block}
+.flagbox{background:var(--warn-bg);border:1px solid var(--warn);border-radius:6px;padding:10px 12px;font-size:14.5px;margin:8px 0}
+.flagbox ul{margin:4px 0 0;padding-left:18px}
+.support{font-size:13.5px}
+.support div{padding:6px 0;border-top:1px solid var(--line)}
+.support div:first-child{border-top:0}
+.support .b{font-weight:600}
+.support .s{color:var(--muted)}
+.fsec{border-top:1px solid var(--line);padding:10px 0}
+.fsec:first-child{border-top:0}
+.fsec .ftitle{font-weight:600;font-size:14.5px;width:100%;background:transparent;border:1px solid transparent;border-radius:6px;padding:4px 6px;resize:none;min-height:0;overflow:hidden}
+.fsec .ftitle:hover,.fline textarea:hover{border-color:var(--line)}
+.fline{display:grid;grid-template-columns:14px 1fr auto;gap:6px;align-items:start;margin:2px 0}
+.fline::before{content:"•";color:var(--muted);padding-top:6px;text-align:center}
+.fline textarea{min-height:0;padding:4px 6px;font-size:14px;background:transparent;border:1px solid transparent;resize:none;overflow:hidden;line-height:1.4}
+.fline textarea:focus,.fsec .ftitle:focus{background:var(--bg)}
+.fline button,.fsec .shead button{padding:2px 8px;font-size:12px;font-weight:500;color:var(--muted)}
+.fsec .shead{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:start}
+.fline.changed textarea{border-left:3px solid var(--accent)}
+.fbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.fbar input{flex:1 1 180px;width:auto}
+@media (prefers-reduced-motion:no-preference){.ring{transition:--pct .4s}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Hamza Job Fit</h1>
+  <p>Paste a posting. See how your verified experience maps to it, close the gaps with real answers, then edit and approve a CV you can defend line by line.</p>
+</header>
+<main>
+  <section class="stack">
+    <div class="panel">
+      <h2>1. The posting</h2>
+      <label for="jd">Job description (paste the whole ad)</label>
+      <textarea id="jd" placeholder="Paste the full job description here, requirements included."></textarea>
+      <div class="row">
+        <div><label for="company">Company</label><input type="text" id="company" placeholder="optional"></div>
+        <div><label for="role">Role title</label><input type="text" id="role" placeholder="taken from the ad if empty"></div>
+      </div>
+      <div class="row">
+        <div><label for="lang">Output language</label>
+          <select id="lang"><option value="English">English</option><option value="Slovak">Slovak</option></select></div>
+        <div><label for="recruiter">Recruiter email or name</label><input type="text" id="recruiter" placeholder="optional"></div>
+      </div>
+      <label class="check"><input type="checkbox" id="wantLetter"> Cover letter</label>
+      <label class="check"><input type="checkbox" id="wantEmail"> Email to the recruiter</label>
+      <label class="check"><input type="checkbox" id="wantPhoto"> Leave a space for a photo</label>
+      <div class="actions">
+        <button class="primary" id="analyse">Check fit</button>
+        <button id="clear">Start a new posting</button>
+      </div>
+      <div class="status" id="s1"></div>
+      <div id="resumeBox" class="hidden" style="margin-top:8px;font-size:14px"><span id="resumeText"></span> <button class="small" id="resumeBtn">Resume it</button> <button class="small" id="discardBtn">Discard</button></div>
+    </div>
+
+    <div class="panel">
+      <h2>Your voice</h2>
+      <p class="muted">Paste a short passage you wrote yourself and like the sound of (an email, a CV paragraph, 3 to 6 sentences). The CV is written to match its register.</p>
+      <textarea id="voice" class="short" placeholder="Example: I joined AT&T to work the inbound line for US customers. Most calls were billing or a slow connection, and about two in three ended with an upgrade I could stand behind."></textarea>
+      <div class="status" id="sVoice"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Fact base</h2>
+      <p class="muted" id="factCount">Loading…</p>
+      <div class="actions" style="margin-top:4px"><button class="primary small" id="openFacts">Edit your facts</button><button class="small" id="showFactText">Show exactly what Claude reads</button></div><div id="factView" class="doc hidden" style="font-size:13px;margin-top:8px;max-height:420px;overflow:auto"></div>
+      <details open><summary>Answers you added</summary><div id="answerView" class="muted">None yet.</div>
+        <div class="actions"><button class="small" id="addFact">Add a fact by hand</button></div>
+        <div id="addFactBox" class="hidden"><textarea id="newFact" class="short" placeholder="One fact, in your words. Example: At AT&T I handled roughly 10 billing disputes a week."></textarea>
+          <div class="actions"><button class="primary small" id="saveFact">Save</button></div></div>
+      </details>
+      <details><summary>Things you confirmed you do not have</summary><div id="negView" class="muted">None yet.</div></details>
+    </div>
+
+    <div class="panel">
+      <h2>Applications</h2>
+      <p class="muted">Each approved CV is stored here with the exact text you sent. Update the status as replies come in.</p>
+      <div class="hist" id="apps">None yet.</div>
+      <details><summary>Fit checks without an approved CV</summary><div class="hist" id="runs">None yet.</div></details>
+      <div class="actions">
+        <button class="small" id="exportAll">Back up everything (.json)</button>
+        <label class="small" style="margin:0"><input type="file" id="importFile" accept="application/json" class="hidden"><button class="small" id="importBtn">Restore a backup</button></label>
+      </div>
+      <div class="status" id="sApps"></div>
+    </div>
+  </section>
+
+  <section class="stack" id="results">
+    <div class="panel hidden" id="factsPanel">
+      <h2>Your facts</h2>
+      <p class="muted">Every line here is something a CV may say. Edit, add or delete, and it saves as you type. Changes apply to CVs written from now on. Approved CVs in Applications stay exactly as you approved them.</p>
+      <div class="fbar"><input type="text" id="factSearch" placeholder="Find a line, for example Salesforce or Dentakay"><button class="small" id="addSection">Add a section</button><button class="small" id="closeFacts">Close</button></div>
+      <div id="factsEditor"></div>
+      <details id="deletedBox"><summary>Deleted lines (<span id="delCount">0</span>)</summary><div id="deletedView" class="muted"></div></details>
+      <div class="status" id="sFacts"></div>
+    </div>
+
+    <div class="panel" id="fitPanel">
+      <h2>2. Fit and evidence</h2>
+      <p class="muted" id="fitEmpty">Paste a posting and press Check fit.</p>
+      <div id="fitBody" class="hidden">
+        <div class="score">
+          <div class="ring" id="ring"><span id="pct">0%</span></div>
+          <div><div class="verdict" id="verdict"></div><p class="muted" id="why" style="margin:4px 0 0"></p></div>
+        </div>
+        <h2 class="sub">Requirements against your verified experience</h2>
+        <table class="req"><thead><tr><th>Requirement</th><th>Status</th><th>Evidence in the fact base</th></tr></thead><tbody id="reqRows"></tbody></table>
+        <h2 class="sub">Keywords</h2>
+        <div id="kwMatched"></div>
+        <div id="kwMissing" style="margin-top:4px"></div>
+        <p class="muted" id="permitNote"></p>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="qPanel">
+      <h2>3. Close the gaps</h2>
+      <p class="muted">Only requirements with no evidence yet are asked. "No" is a good answer: it is stored, never claimed, and not asked again. "Yes" or "Partly" needs a sentence with the real scope or figure.</p>
+      <div id="questions"></div>
+      <div class="actions">
+        <button class="primary" id="build">Write the CV</button>
+        <button id="skip">Skip questions, write anyway</button>
+      </div>
+      <div class="status" id="s2"></div>
+    </div>
+
+    <div class="panel hidden" id="outPanel">
+      <h2>4. Review, edit, approve</h2>
+      <div class="tabs" id="tabs">
+        <button data-tab="review" aria-selected="true">What changed and why</button>
+        <button data-tab="cv">CV (editable)</button>
+        <button data-tab="text">Plain text</button>
+        <button data-tab="letter" class="hidden">Cover letter</button>
+        <button data-tab="email" class="hidden">Email</button>
+      </div>
+      <div id="tab-review">
+        <div id="flags"></div>
+        <div id="changes"></div>
+        <h2 class="sub">Every bullet and the fact behind it</h2>
+        <div class="support" id="support"></div>
+      </div>
+      <div id="tab-cv" class="hidden"><p class="muted">Click any line to edit it. Edits are kept and used for the download and the approved version.</p><div class="cv" id="cvView"></div></div>
+      <div id="tab-text" class="hidden"><p class="muted">What a parser or a plain-text form sees.</p><div class="doc mono" id="textView"></div></div>
+      <div id="tab-letter" class="hidden"><textarea id="letterView" style="min-height:320px"></textarea></div>
+      <div id="tab-email" class="hidden"><textarea id="emailView" style="min-height:200px"></textarea></div>
+      <div class="actions">
+        <button class="primary" id="approve">Approve this version and save it to Applications</button>
+        <button id="dlDocx">Download .docx</button>
+        <button id="dlTxt">Download .txt</button>
+        <button id="copyCv">Copy CV text</button>
+        <button id="copyLetter" class="hidden">Copy cover letter</button>
+        <button id="copyEmail" class="hidden">Copy email</button>
+        <button id="rebuild">Rewrite with new answers</button>
+        <button id="shorten">Shorten to 2 pages</button>
+      </div>
+      <p class="muted">The .docx opens in Word or LibreOffice. Save as PDF there before sending. Nothing here guarantees a parser score or an interview. It does keep every line tied to something you did.</p>
+      <div class="status" id="s3"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ===================== FACT BASE (settled 16 Nov 2026) ===================== */
+const BASE_FACTS = `
+IDENTITY
+- Name: Hamza Moumine. Based in Bratislava, Slovakia. Phone +421 911 656 406. Email hmoumine@outlook.com. City only on CV, no street address.
+- Work status: temporary work permit, Slovakia (tied to one employer). On CV, cover letter and email write only "Work permit holder, Slovakia". Explain the details only if the employer asks. Slovak driving licence, category B.
+- Availability: can start immediately (ASAP).
+- Never mention salary, pay expectations or the posting's salary in any document.
+- Languages: English C2, French C2, Arabic C2, Mandarin Chinese B2, Turkish A2, Slovak A1 (learning).
+- No LinkedIn link on CVs. No photo unless asked. No date of birth, no nationality, no GPA.
+
+AT&T GLOBAL NETWORK SERVICES, Bratislava. Client Solutions & Sales Representative (B2B/B2C). Dec 2024 to Oct 2026.
+- Inbound support and sales line for US customers, both consumer and business. Calls covered billing problems, technical faults, upgrades, and new customers.
+- Volume: 30 to 40 inbound calls a day, 800 to 1,100 a month. 25 to 32 of those ended in a sale (an upgrade or an added service). Do not write a bare percentage; write the volumes.
+- Ranked second of 12 on his team for call volume and for sales. This is an achievement: write it with the ranking. His team was the department's top-performing team (the other teams had newer staff and learned from his team), so it may be written as "ranked 2nd of 12 on the department's top-performing team".
+- Team context: AT&T in Bratislava had four teams. His team handled both troubleshooting and sales, while the other teams did only sales or only troubleshooting. His sales came on top of fixing customer problems. Use only for customer service, support or operations postings.
+- Outbound too: made outbound calls when needed to set up meetings with stakeholders at small and mid-size business customers (not large enterprises), reviewed the services they had and what could be improved, and offered available loyalty discounts.
+- What was sold: moving customers off legacy services to fiber or fixed wireless internet. For business customers: speed upgrades, landlines and cell phones for staff, device protection plans, phone model upgrades for company fleets.
+- Top Sales Performer, Q3 and Q4 2025 (two consecutive quarters).
+- Salesforce story: noticed paid Salesforce features sitting unused (knew them from Amazon). Proposed connecting Salesforce to the internal CRMs so orders and equipment sales ran from Salesforce without manual double entry. Pitched to IT and the manager, who implemented it. Write as "proposed" and "adopted by IT". No percentage was measured, so none may be written. Timeline: proposed in writing in mid-2025, management assessed cost and benefit and worked with Salesforce (AT&T's vendor), live and in use about 3 months later. Rollout: his manager approved it after seeing the benefit for customer communication, it was piloted on his own team of 12, then shared with the whole department after the team saw the impact, and later implemented in the US too. Most communication with senior levels at AT&T went through his direct manager, who looped him into emails when his input was needed.
+- Handled billing disputes: investigated charges, explained contract terms, coordinated with billing, technical support and retention teams.
+- Credit checks: before service changes or new items on an account, ran credit checks on customers, confirmed whether they were eligible, and told them what they needed to settle or improve before the order could go ahead.
+- Price changes: explained the price changes that came with service migrations (DSL to fiber, 4G to 5G) and applied bundle discounts when customers added lines at the same address, within the price ranges the company allowed.
+- CRM data: when he found customer accounts with wrong or incorrect information, he reported the error and corrected the account record in Salesforce. Not frequent, because the team was strict about data. No count.
+- Systems: Salesforce CRM, internal CRMs and ticketing tools, Microsoft 365.
+- Partly also here: agreed terms with business customer stakeholders, then handed over to the teams that prepared the contracts. Did not write contracts.
+
+AMAZON RETAIL, Bratislava. Account and Vendor Manager for EMEA and META. Jul 2024 to Oct 2024 (4 months, left by own choice: no commission, no promotion path).
+- Vendors were spread across the EMEA marketplaces, including the Netherlands, Ireland, Spain, Italy and France. Germany, France and the UK were the main fulfilment centre countries, not where all vendors were. No vendors in the Nordic countries.
+- Supported a portfolio of 40+ European corporate vendor accounts with about EUR 100M in combined annual sales. Never write "managed EUR 100M"; the money was the vendors' sales, not a budget he controlled. Allowed: "managed a portfolio of 40+ vendor accounts worth about EUR 100M in combined annual sales".
+- Negotiated 6 large vendors from self-shipping onto Fulfillment by Amazon during the annual Q4 vendor negotiations (stock shipped to Amazon fulfilment centres, mainly in Germany). Deals signed before he left. Contract conversions across that large-vendor portfolio rose 10%. Do not give a total number of large vendors (he does not remember if it was 14 or 15).
+- Campaign price changes: for events such as Black Friday and Prime Day, negotiated price changes with about 20 vendors per campaign, using the profitability data and projections from Amazon's system to get them to agree. Prices came from Amazon's system: he did not calculate prices from cost plus a margin himself.
+- Currencies: kept a large Excel sheet that converted vendor prices from GBP and USD into EUR with exchange rates pulled live from online, before upload. Amazon's system then checked them against current rates. Most vendors were asked to quote in EUR.
+- Negotiated commercial terms with vendors himself: delivery times, price changes and discounts. Not formal SLAs: never write "SLA".
+- Ran business reviews, reviewed account performance, resolved contract and invoicing disputes with vendors, commercial teams and operations across Europe.
+- Used Customer Central (Amazon's internal vendor system) to check product profitability and viability and to flag ASINs with problems. Built the case for moving vendors to Fulfillment by Amazon from that analysis.
+- Deal coordination up to signature: agreed terms with vendor stakeholders, kept the system updated, handed over to the legal team, and joined contract drafting meetings with the stakeholders and legal when needed. Did not write contracts himself, and pricing and contract terms were finalised by other departments.
+- Prepared vendor contracts from templates approved by the legal team, then sent them to legal, who corrected and finalised them. Did not draft contracts.
+- Reviewed the catalogue data of his top vendors every week and asked the vendors to make changes when needed. Did not edit listings himself.
+- Identified and contacted Chinese suppliers when needed (Mandarin).
+- Systems: Salesforce, Customer Central, Excel reporting.
+
+DENTAKAY, Istanbul. Sales Closer, international clients. Feb 2023 to Apr 2024.
+- Dental treatment sales to international clients, consultative selling in English, French and Chinese. Cold calling (tons of calls a day), then meeting clients face to face when they came to the clinic, video calls only when needed.
+- Did both: closed deals for the team as the closer, and ran his own portfolio with his own quota and commission.
+- Much of his monthly revenue came from referrals: clients who trusted him brought friends (one client came back with two of her friends).
+- Team revenue USD 4.4M a year, 25% year-on-year growth. Write "team" when citing the 4.4M.
+- Personal best month: USD 150,000 in closed sales.
+- Coached 4 sales representatives on discovery-to-close and follow-up (formal or informal: unconfirmed, write "coached", not "managed").
+- Tracked his own sales, the English-speaking team's sales and the conversion of leads coming from marketing in Power BI, Excel and PowerPoint dashboards. Reviewed them with the manager at the end of each month.
+- Built a team reporting sheet and a checklist in Excel: formulas locked, input cells open, each rep filled in their own tab.
+- Monthly sales forecasts for the team of 4 he coached: built in Excel from previous years' numbers, presented in Power BI in meetings. The monthly quota was adjusted based on the forecast.
+- Written offers: sent 2 to 3 written offers a day to international clients, listing the treatments they were interested in, prices, what was included and the down-payment steps, then guided them through payment.
+- Award: Top English-Speaking Sales Team, Q2 and Q3 2023.
+
+CLINIC EXPERT HOSPITAL, Istanbul. Master Sales Representative. Oct 2021 to Feb 2023.
+- Cold calling, 100 to 300 calls a day, for international patients. Met clients face to face when they came to the clinic, video calls only when needed.
+- Personal closes of USD 30,000 to 70,000 a month.
+- Built his own monthly sales forecast in Excel from previous years' numbers, against his monthly quota.
+- Written offers: sent 2 to 3 written offers a day to international patients with the treatments, prices, inclusions and down-payment steps, and guided them through payment.
+- Hamza introduced a consultative approach on the phone and in face-to-face meetings himself. Team monthly revenue grew 45% after he introduced it (the 45% is a team figure, the introduction was his).
+- Coordinated handovers between qualification and closing teams.
+- Clients named him in Trustpilot and Google reviews of the clinic. No count is known: never write "550" or any number of reviews.
+- Award: Master Sales Award, 2022.
+- Left for Dentakay because lead quality and revenue were low.
+
+STMICROELECTRONICS, Casablanca (Morocco) and Shenzhen (China, most of 2019 with training there, during the Team Leader period only).
+Maintenance Team Leader, Sep 2017 to Aug 2021. Senior Maintenance Technician, Aug 2015 to Sep 2017.
+- Automotive semiconductor back-end production. Maintained ASM die bonding and wire bonding machines, working knowledge of molding.
+- Led a night-shift team of 9 operators. Kept shift output above 95%, about 1.5 million pieces per shift.
+- Night shift: urgent repairs at night, otherwise idled machines and prepared them for the day shift's daily and monthly preventive maintenance. Set up scheduling of preventive maintenance outside normal shifts.
+- Excel maintenance tracker: built it as Senior Maintenance Technician around 2016 (full machine history, drop-down list of past faults, failure probability, downtime and quality changes). Presented it to his supervisor, the production manager and the technical director. The team adopted it and it was implemented on all production lines. It contributed to the Production Efficiency Award 2016 to 2017, which helped his promotion to team leader.
+- As team leader: prioritised preventive maintenance by fault severity and SAP output counts against the 100% per-shift target. Fixed faults on the spot when they hit output, otherwise deferred them to scheduled maintenance.
+- Reduced downtime and repair costs by training operators and technicians (no exact figures, do not invent any).
+- New line commissioning, Q3 to Q4 2017 (as team leader): 4 new ASM Eagle production lines, 24 machines (5 wire bonders and 1 die bonder per line), about 3.5 months from order to production. Trained in Singapore first. Supported the supplier's foreign engineers on installation and was the English-French go-between with the local team, briefed technicians in a team meeting, trained operators, and checked output against quality assurance standards through handover to production. His role was supporting, not leading.
+- Safety: completed PPE (EPI), high and low voltage electrical and fire safety training. As team leader ran fire and hazard drills to check operators followed the rules and knew the evacuation routes.
+- Managed the maintenance budget and cost reporting in SAP. 95% average score in ISO 9001 quality audits (real figure).
+- ISO 9001 audits on both sides: his area was audited, and he also ran audits.
+- Read mechanical drawings in CAD to diagnose faults. Mentored junior technicians.
+- Production Efficiency Award, 2016 to 2017.
+
+EARLIER AND SIDE
+- VIVO Telecommunication, El Jadida region, Morocco, 2021: a personal project with Chinese acquaintances, not a job with an employer. Built sales tracking and reporting to analyse regional performance, and managed relationships with customers, wholesalers and retailers in the region. Never list it under Experience as employment. It may appear once under Additional as an independent project when a posting values regional sales or distribution.
+- After COVID (2020 to 2021): consulting in Morocco helping Chinese clients set up a factory (paperwork, arrangements). References available.
+- Final internship, Group Premium, Casablanca, 2015 (4 to 5 months): designed a test bench in SolidWorks for John Deere equipment.
+- Builds PCs from components, repairs phones, fixes equipment as a hobby. Built a personal app showing Bratislava buses and trolleybuses as live positions on a map, searchable by line.
+- Uses Claude and Microsoft Copilot inside Excel and Microsoft 365 for reporting and analysis. Used Copilot in Excel on sales data at work. Also uses ChatGPT and Gemini.
+- Never mention his personal hardware trading (RAM, SSDs).
+- SolidWorks used mainly during studies; CAD for reading drawings at ST. Manual technical drawing by hand. ISO 9001.
+
+EDUCATION
+- Bachelor's degree, Industrial and Production Management, Ibn Tofail University, Kenitra, Morocco, Nov 2020 to Jul 2021.
+- Technical diploma, Mechanical Engineering, Ecole Superieure de Technologie (ESTC), Casablanca, Sep 2013 to Jul 2015.
+
+CERTIFICATES (2026)
+- Excel Skills for Business: Intermediate I, Macquarie University via Coursera, Oct 2026 (verify: coursera.org/verify/KSM130A09604).
+- Sales Analysis with Claude: Data Driven Sales Analytics, Coursera project, Nov 2026 (verify: coursera.org/verify/DMVY6IZY1OEO).
+- Negotiation Skills, LinkedIn Learning, Oct 2026.
+- Account Management: Maintaining Relationships, LinkedIn Learning, Oct 2026.
+- Excel Skills for Business: Intermediate II, Macquarie University via Coursera, Nov 2026 (verify: coursera.org/verify/RMTIE1O5NK4D).
+- No Power BI certificate. Power BI is work experience (Dentakay), not a certificate.
+- Foundations of Project Management, Google via Coursera, completed Nov 2026 (verify: coursera.org/verify/OGX80LG3J71Q). List it as completed. Do not list the full Google Project Management Certificate as in progress.
+
+OPEN ITEMS (do not use until confirmed): whether the VIVO project and the factory set-up consulting for Chinese clients were the same thing.
+
+CONFIRMED 17 NOV 2026
+- STMicroelectronics split is correct: die and wire bonding maintenance and CAD under Senior Maintenance Technician, the team of 9, SAP budget and ISO 9001 audits under Maintenance Team Leader.
+`;
+
+/* ===================== WRITING RULEBOOK ===================== */
+const RULEBOOK = `
+RULES FOR EVERY DOCUMENT
+1. Source of truth: the FACT BASE and the CONFIRMED ANSWERS. Never invent a responsibility, skill, date, qualification, achievement or number. Anything under DOES NOT HAVE is never claimed, hinted at or paraphrased in.
+2. Job titles, employers, cities and dates are copied exactly from the fact base. Chronology stays reverse chronological. Never relabel a role with the posting's title.
+3. Use the posting's wording for a skill or tool only when it accurately describes work in the facts ("Salesforce" if he used Salesforce, "key account management" only where he managed accounts). Put each such term inside the job where it was done, not only in a skills list.
+4. Each bullet is an achievement or a responsibility. Achievement: a result he caused, a ranking or comparison against colleagues, an award, a change he introduced, or a volume shown against a benchmark (for example "second highest of 12"). Responsibility: the day-to-day job, with how often and for whom. Turn a responsibility into an achievement whenever a fact gives its result or comparison, and lead with that result. Never manufacture an outcome.
+5. Numbers only from the facts, as volumes where volumes exist. Team figures are marked as team figures.
+6. A figure appears in one bullet per job, never repeated across bullets, and the same number should not repeat across the Summary, Key skills and Experience unless it is his headline result. Write in a warm, natural, human tone, like a person describing his own work: full, connected sentences that read smoothly, plain everyday words, never corporate polish or inflated claims. Direct verbs, concrete context (who called, what was sold, which machine). Vary sentence length and shape. Do not open consecutive bullets the same way. The pattern "Achieved X% by doing Y" appears at most once per job.
+7. Do not use: results-driven, dynamic, self-starter, proven track record, leveraged, synergies, spearheaded, orchestrated, passionate, cutting-edge, innovative, robust, seamless, meticulous, strategic (about himself), fostered, cultivated, navigated, utilize, drive growth, thought leader, team player, excellent communication skills, in today's fast-paced. Keep useful technical terms (ISO 9001, SAP, die bonding, Fulfillment by Amazon).
+8. No em dashes or semicolons.
+9. Summary: 3 to 4 natural, flowing sentences in the same human tone. What he has done, for whom, with what numbers, and what he is applying for. No adjectives about himself.
+10. Hybrid layout, 2 A4 pages maximum (at most 850 words in total, counting every section), standard headings in this order: Summary, Key skills, Experience (shown in two groups, Sales and account management experience and Technical and operations experience; the page groups the jobs itself, so keep the experience array in reverse chronological order), Tools and systems, Education, Certificates, Languages, Awards, Additional. Dates as "Mon YYYY to Mon YYYY". No tables, columns, icons or graphics.
+10a. Key skills: 5 to 7 entries picked for this posting, each a skill name in the posting's wording where true, then one line (max 20 words) saying where he did it and with what result. Every key skill must also appear inside the matching job below, in different words.
+11. Experience: every role has at least 2 bullets and at most 5. Relevant roles get 4 to 5, unrelated roles exactly 2. Order bullets within each job by relevance to this posting. If the CV would pass 2 pages, cut bullets from the least relevant roles first, never below 2.
+12. For a maintenance or technical posting, the technical group comes first and STMicroelectronics is detailed, with sales roles compressed. For sales, account or customer roles, the reverse. For customer service or banking, AT&T first in detail.
+13. Slovak output: natural Slovak as a Slovak HR person would write it, keep company and product names and CEFR levels. If the posting requires Slovak, state "Slovak A1, learning" and nothing more.
+14. Cover letter: 180 to 260 words, 3 paragraphs, no "I am writing to apply". Open with one specific fact that fits the role. Name the company. Close with availability to start immediately. Never mention salary. Never explain the permit beyond "work permit holder". Email: 90 to 140 words with a subject line, plain, no flattery.
+17. Wording settled with him (27 Nov 2026): Amazon may be written as "managed a portfolio of 40+ vendor accounts worth about EUR 100M in combined annual sales", never "managed EUR 100M". AT&T ranking may be written as "ranked 2nd of 12 on the department's top-performing team". Vendor negotiations are "commercial terms such as delivery times, price changes and discounts", never "SLA". Never "enterprise" for AT&T customers (small and mid-size businesses), never "globally" for the Salesforce rollout (it went to the department and the US).
+16. AT&T team context (four teams, his team did troubleshooting and sales while others did only one) is for customer service, support or operations postings only. Leave it out otherwise.
+15. Match the VOICE SAMPLE's register (sentence length, directness, vocabulary) when one is given. Do not copy its content.
+`;
+
+/* ===================== STATE ===================== */
+let sample=null, db=null, downloads=null;
+let state={answers:[], runs:[], applications:[], voice:""};
+let current=null; resetCurrent();
+function resetCurrent(){current={analysis:null,cv:null,letter:"",email:"",jd:"",role:"",company:""};}
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function setStatus(id,msg,err){const el=$(id);if(!el)return;el.textContent=msg||"";el.classList.toggle("err",!!err);}
+function today(){return new Date().toISOString().slice(0,10);}
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+function factsToText(f){
+  return f.sections.map(sec=>{const lines=sec.lines.map(l=>l.text.trim()).filter(Boolean).map(t=>"- "+t).join("\n");return (sec.title.trim()?sec.title.trim()+"\n":"")+lines;}).join("\n\n");
+}
+function parseFacts(txt){
+  const sections=[];let cur=null;
+  txt.split("\n").forEach(raw=>{
+    const line=raw.trimEnd();
+    if(!line.trim()){cur=null;return;}
+    if(line.startsWith("- ")){if(!cur){cur={id:uid("s"),title:"",lines:[]};sections.push(cur);}cur.lines.push({id:uid("l"),text:line.slice(2).trim()});}
+    else{if(!cur||cur.lines.length){cur={id:uid("s"),title:line.trim(),lines:[]};sections.push(cur);}else cur.title+=(cur.title?"\n":"")+line.trim();}
+  });
+  return {rev:0,seeded:FACTS_SEED,sections,deleted:[]};
+}
+const FACTS_SEED="2026-11-27";
+function ensureFacts(){
+  if(!state.facts||!state.facts.sections)state.facts=parseFacts(BASE_FACTS);
+  else if(state.facts.seeded!==FACTS_SEED){
+    const fresh=parseFacts(BASE_FACTS);
+    if(!state.facts.rev){const del=state.facts.deleted||[];state.facts=fresh;state.facts.deleted=del;}
+    else{
+      const key=t=>t.toLowerCase().slice(0,24);
+      const have=new Set(state.facts.sections.flatMap(x=>x.lines.map(l=>l.text.trim())));
+      const gone=new Set((state.facts.deleted||[]).map(d=>d.text.trim()));
+      fresh.sections.forEach(fs=>{
+        let mine=state.facts.sections.find(x=>key(x.title)===key(fs.title));
+        const pre=t=>t.trim().toLowerCase().slice(0,30);
+        let add=fs.lines.filter(l=>!have.has(l.text.trim())&&!gone.has(l.text.trim()));
+        if(mine)add=add.filter(l=>{const old=mine.lines.find(o=>!o.edited&&pre(o.text)===pre(l.text));if(old){old.text=l.text;return false;}return true;});
+        add=add.map(l=>Object.assign(l,{edited:FACTS_SEED}));
+        if(mine&&add.length)mine.lines.push(...add);
+        if(!add.length)return;
+        if(mine)return;else state.facts.sections.push(Object.assign(fs,{lines:add}));
+      });
+      state.facts.seeded=FACTS_SEED;state.facts.rev=Date.now();
+    }
+  }
+  return state.facts;
+}
+function factText(){
+  const live=state.answers.filter(a=>!a.retired);
+  const yes=live.filter(a=>a.kind!=="no");
+  const no=live.filter(a=>a.kind==="no");
+  let t=factsToText(ensureFacts());
+  if(yes.length)t+="\nCONFIRMED ANSWERS (added by Hamza through this page, use as facts)\n"+yes.map(a=>`- ${a.q?a.q+" -> ":""}${a.a}${a.ctx?" (said while applying for: "+a.ctx+")":""}`).join("\n")+"\n";
+  if(no.length)t+="\nDOES NOT HAVE (Hamza confirmed these are not part of his experience, never claim them, never ask again)\n"+no.map(a=>`- ${a.q}${a.a&&a.a!=="No"?" ("+a.a+")":""}`).join("\n")+"\n";
+  if(state.voice)t+="\nVOICE SAMPLE (his own writing, match the register, do not reuse the content)\n"+state.voice+"\n";
+  return t;
+}
+function renderFacts(){
+  $("factView").textContent=factText();
+  const live=state.answers.filter(a=>!a.retired);
+  const yes=live.filter(a=>a.kind!=="no"), no=live.filter(a=>a.kind==="no");
+  const nl=ensureFacts().sections.reduce((n,x)=>n+x.lines.length,0);
+  $("factCount").textContent=`${nl} fact lines in ${state.facts.sections.length} sections, ${yes.length} confirmed answer${yes.length===1?"":"s"}, ${no.length} ruled out.${state.facts.rev?" Last edited "+new Date(state.facts.rev).toLocaleString():""}`;
+  const item=a=>`<div class="q"><p>${esc(a.q||"Added by hand")}</p><p>${esc(a.a)}</p><small>${esc(a.date||"")}${a.ctx?" · "+esc(a.ctx):""}</small> <button class="small" data-del="${a.id}" style="margin-left:8px">Remove</button></div>`;
+  $("answerView").innerHTML=yes.length?yes.map(item).join(""):"None yet.";
+  $("negView").innerHTML=no.length?no.map(item).join(""):"None yet.";
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{const x=state.answers.find(y=>y.id===b.dataset.del);if(x){x.retired=true;x.rev=Date.now();}renderFacts();persist();});
+  $("voice").value=state.voice||"";
+}
+const STATUSES=["draft","applied","screening","interview","offer","rejected","no answer"];
+function renderApps(){
+  const el=$("apps");
+  if(!state.applications.length){el.textContent="None yet.";}
+  else el.innerHTML=state.applications.slice().reverse().map(a=>`<div class="app"><span><b>${esc(a.role)}</b>${a.company?" at "+esc(a.company):""} · ${a.pct}%</span>
+    <select data-st="${a.id}">${STATUSES.map(s=>`<option ${a.status===s?"selected":""}>${s}</option>`).join("")}</select>
+    <small>${esc(a.date)} · v${a.version} · <a href="#" data-open="${a.id}">open</a> · <a href="#" data-dl="${a.id}">.docx</a></small></div>`).join("");
+  el.querySelectorAll("[data-st]").forEach(s=>s.onchange=()=>{const a=state.applications.find(x=>x.id===s.dataset.st);if(a){a.status=s.value;a.statusDate=today();persist();}});
+  el.querySelectorAll("[data-open]").forEach(l=>l.onclick=ev=>{ev.preventDefault();const a=state.applications.find(x=>x.id===l.dataset.open);if(!a)return;current={analysis:a.analysis||null,cv:a.cv,letter:a.letter||"",email:a.email||"",jd:a.jd||"",role:a.role,company:a.company};if(a.analysis)showAnalysis(a.analysis,true);renderOutput(true);selectTab("cv");$("outPanel").scrollIntoView({behavior:"smooth"});setStatus("s3",`Showing the version approved on ${a.date}. Changes here update that record.`);});
+  el.querySelectorAll("[data-dl]").forEach(l=>l.onclick=ev=>{ev.preventDefault();const a=state.applications.find(x=>x.id===l.dataset.dl);if(a)save(fileStem(a.role,a.company)+".docx",docxFromCv(a.cv));});
+  const r=$("runs");
+  const runs=state.runs.filter(x=>!state.applications.some(a=>a.runId===x.id));
+  r.innerHTML=runs.length?runs.slice().reverse().slice(0,20).map(x=>`<div class="app"><span>${esc(x.role)}${x.company?" at "+esc(x.company):""}</span><b>${x.pct}%</b><small>${esc(x.date)}</small></div>`).join(""):"None yet.";
+}
+
+/* ===================== DRAFT (this browser, restored on reload) ===================== */
+const FIELDS=["jd","company","role","recruiter","lang"], FLAGS=["wantLetter","wantEmail","wantPhoto"];
+let draftTimer=null;
+function saveDraft(){
+  clearTimeout(draftTimer);
+  draftTimer=setTimeout(()=>{
+    try{
+      const d={fields:{},flags:{},answersDraft:{},current,saved:new Date().toISOString()};
+      FIELDS.forEach(f=>d.fields[f]=$(f).value);FLAGS.forEach(f=>d.flags[f]=$(f).checked);
+      document.querySelectorAll("#questions .q").forEach(q=>{const id=q.dataset.qid;const r=q.querySelector("input[type=radio]:checked");const t=q.querySelector("textarea").value;if(r||t)d.answersDraft[id]={r:r?r.value:"",t};});
+      localStorage.setItem("jobfit-draft",JSON.stringify(d));
+    }catch(e){}
+  },250);
+}
+function offerResume(){
+  let d=null;try{d=JSON.parse(localStorage.getItem("jobfit-draft")||"null");}catch(e){}
+  if(!d||!(d.fields&&d.fields.jd&&d.fields.jd.trim()))return;
+  const role=(d.current&&d.current.role)||(d.fields.role)||"an unfinished posting";
+  const co=(d.current&&d.current.company)||(d.fields.company)||"";
+  const when=d.saved?new Date(d.saved).toLocaleString():"earlier";
+  $("resumeText").textContent=`Unfinished run in this browser: ${role}${co?" at "+co:""}, ${when}.`;
+  $("resumeBox").classList.remove("hidden");
+}
+$("resumeBtn").onclick=()=>{restoreDraft();$("resumeBox").classList.add("hidden");};
+$("discardBtn").onclick=()=>{try{localStorage.removeItem("jobfit-draft");}catch(e){}$("resumeBox").classList.add("hidden");};
+function restoreDraft(){
+  let d=null;try{d=JSON.parse(localStorage.getItem("jobfit-draft")||"null");}catch(e){}
+  if(!d)return;
+  try{
+    FIELDS.forEach(f=>{if(d.fields&&d.fields[f]!=null)$(f).value=d.fields[f];});
+    FLAGS.forEach(f=>{if(d.flags&&d.flags[f]!=null)$(f).checked=d.flags[f];});
+    if(d.current)current=Object.assign(current,d.current);
+    if(current.analysis){
+      showAnalysis(current.analysis,true);
+      document.querySelectorAll("#questions .q").forEach(q=>{const a=d.answersDraft&&d.answersDraft[q.dataset.qid];if(!a)return;if(a.r){const r=q.querySelector(`input[value="${a.r}"]`);if(r)r.checked=true;}q.querySelector("textarea").value=a.t||"";});
+      setStatus("s1","Restored your last run from this browser.");
+    }
+    if(current.cv)renderOutput(true);
+  }catch(e){console.warn("restore",e);}
+}
+window.addEventListener("error",ev=>setStatus("s2","Page error: "+(ev.message||"unknown"),true));
+window.addEventListener("unhandledrejection",ev=>{const r=ev.reason||{};setStatus("s2","Error: "+(r.message||r.code||String(r)),true);});
+
+/* ===================== PERSISTENCE (db with local copy) ===================== */
+function withTimeout(p,ms){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),ms))]);}
+function mergeState(data){
+  if(!data)return;
+  ["answers","runs","applications"].forEach(k=>{if(Array.isArray(data[k])){data[k].forEach(x=>{const i=state[k].findIndex(y=>y.id===x.id);if(i<0)state[k].push(x);else if((x.version||0)>(state[k][i].version||0)||(x.rev||0)>(state[k][i].rev||0))state[k][i]=x;});}});
+  if(data.facts&&data.facts.sections&&(!state.facts||(data.facts.rev||0)>(state.facts.rev||0)))state.facts=data.facts;
+  if(data.voice&&(!state.voice||(data.voiceRev||0)>(state.voiceRev||0))){state.voice=data.voice;state.voiceRev=data.voiceRev||0;}
+}
+async function load(){
+  try{const raw=localStorage.getItem("jobfit-state");if(raw)mergeState(JSON.parse(raw));}catch(e){}
+  renderFacts();renderApps();offerResume();
+  FIELDS.forEach(f=>$(f).addEventListener("input",()=>{$("resumeBox").classList.add("hidden");saveDraft();}));
+  ["role","company"].forEach(f=>$(f).addEventListener("input",()=>{$(f).dataset.typed=$(f).value.trim()?"1":"";}));
+  $("jd").addEventListener("input",()=>{["role","company"].forEach(f=>{if($(f).dataset.typed!=="1")$(f).value="";});});FLAGS.forEach(f=>$(f).addEventListener("change",saveDraft));
+  $("questions").addEventListener("input",saveDraft);$("questions").addEventListener("change",saveDraft);
+  try{
+    db=await claude.use("db");
+    if(db){
+      const snap=await withTimeout(db.doc("profile/state").get(),10000);
+      const data=snap&&(typeof snap.data==="function"?snap.data():(snap.exists===false?null:snap));
+      if(data){mergeState(data);renderFacts();renderApps();if(!$("factsPanel").classList.contains("hidden")&&!$("factsPanel").contains(document.activeElement))renderFactsEditor();}
+    }
+  }catch(e){db=null;}
+}
+let persistTimer=null;
+function persist(){
+  try{localStorage.setItem("jobfit-state",JSON.stringify(state));}catch(e){}
+  clearTimeout(persistTimer);
+  persistTimer=setTimeout(async()=>{
+    if(!db)return;
+    try{
+      try{const snap=await withTimeout(db.doc("profile/state").get(),6000);const remote=snap&&(typeof snap.data==="function"?snap.data():(snap.exists===false?null:snap));if(remote){mergeState(remote);try{localStorage.setItem("jobfit-state",JSON.stringify(state));}catch(e){}}}catch(e){}
+      await withTimeout(db.doc("profile/state").set({answers:state.answers,runs:state.runs,applications:state.applications,facts:state.facts||null,voice:state.voice,voiceRev:state.voiceRev||0,updated:new Date().toISOString()}),8000);}
+    catch(e){console.warn("db write",e);setStatus("sApps","Saved in this browser. The shared save failed: "+(e.code||e.message),true);}
+  },600);
+}
+
+/* ===================== CLAUDE CALLS ===================== */
+async function ensureSample(){
+  if(sample)return sample;
+  sample=await claude.use("sample");
+  if(!sample)throw new Error("Claude is not available in this view. Open the page signed in to claude.ai.");
+  return sample;
+}
+function parseJson(out){
+  if(out&&typeof out==="object")return out;
+  let t=String(out||"").trim().replace(/^```(?:json)?/i,"").replace(/```$/,"").trim();
+  try{return JSON.parse(t);}catch(e){const a=t.indexOf("{"),b=t.lastIndexOf("}");if(a>=0&&b>a)return JSON.parse(t.slice(a,b+1));throw new Error("Claude returned something that was not JSON. Press the button again.");}
+}
+function friendly(e){
+  const code=e&&e.code;
+  if(code==="not_granted")return "Claude access was not granted for this page. Allow it when the page asks.";
+  if(code==="rate_limited")return "Too many requests right now. Wait a minute and try again.";
+  return (e&&e.message)||String(e);
+}
+
+async function analyse(){
+  const jd=$("jd").value.trim();
+  if(jd.length<80){setStatus("s1","Paste the full job description first.",true);return;}
+  $("analyse").disabled=true;setStatus("s1","Reading the posting against the fact base…");
+  try{
+    const s=await ensureSample();
+    const prompt=`You screen one candidate against a job posting the way a careful senior recruiter would. Be strict and literal. Today is ${today()}.
+
+FACT BASE ABOUT THE CANDIDATE
+${factText()}
+
+JOB POSTING
+${jd}
+
+Return ONLY a JSON object:
+{
+ "role_title": "job title from the posting",
+ "company": "company from the posting or empty string",
+ "fit_pct": integer 0 to 100. Honest: 85+ only when nearly every must-have has evidence. A required language he lacks (Slovak above A1, German, etc.), a required degree, licence or certification he lacks, or required industry experience he lacks, each pull the score down hard.
+ "verdict": one sentence a recruiter would say,
+ "why": two sentences on what drives the score,
+ "requirements": [for each real requirement or responsibility in the posting (6 to 14 items, must-haves first):
+   {"requirement":"short, in the posting's words","status":"strong"|"partial"|"none"|"unknown","evidence":"the specific fact that supports it, or empty"}
+   status meaning: strong = clear evidence in facts; partial = related but weaker evidence; none = listed under DOES NOT HAVE or clearly contradicted by the facts; unknown = facts are silent, a question could settle it],
+ "keywords_matched": [exact phrases from the posting that the facts support],
+ "keywords_missing": [exact phrases from the posting that the facts do not support],
+ "permit_note": one sentence if the posting mentions work authorization, EU citizenship or a required language, else "",
+ "questions": [for each requirement with status "unknown" only, up to 7: {"id":"q1","requirement":"the requirement","question":"a direct question in plain words: has he done this, how often, for whom, any figure or example"}]
+}
+Never ask about anything under CONFIRMED ANSWERS or DOES NOT HAVE. Never assume he has something the facts do not state. No markdown, JSON only.`;
+    const out=await s.json(prompt,{modelTier:"default",cache:false,onText:p=>setStatus("s1","Reading… "+((p&&p.text)?p.text.length:0)+" characters so far")});
+    const a=parseJson(out);
+    a.runId=uid("r");
+    const typedRole=$("role").dataset.typed==="1"?$("role").value.trim():"", typedCo=$("company").dataset.typed==="1"?$("company").value.trim():"";
+    current={analysis:a,cv:null,letter:"",email:"",jd,role:typedRole||a.role_title||"",company:typedCo||a.company||""};
+    $("role").value=current.role;$("company").value=current.company;
+    showAnalysis(a);saveDraft();
+    setStatus("s1","Done. Scroll down for the evidence map and the questions.");
+    state.runs.push({id:a.runId,date:today(),role:current.role,company:current.company,pct:a.fit_pct});
+    renderApps();persist();
+  }catch(e){setStatus("s1",friendly(e),true);}
+  finally{$("analyse").disabled=false;}
+}
+const STATUS_PILL={strong:["good","Evidence"],partial:["warn","Partial"],none:["bad","Not in your experience"],unknown:["grey","No evidence yet"]};
+function showAnalysis(a,quiet){
+  $("fitEmpty").classList.add("hidden");$("fitBody").classList.remove("hidden");
+  const pct=Math.max(0,Math.min(100,parseInt(a.fit_pct)||0));
+  const ring=$("ring");ring.style.setProperty("--pct",pct);
+  ring.style.setProperty("--ring-color",pct>=75?"var(--good)":pct>=55?"var(--warn)":"var(--bad)");
+  $("pct").textContent=pct+"%";
+  $("verdict").textContent=a.verdict||"";$("why").textContent=a.why||"";
+  $("reqRows").innerHTML=(a.requirements||[]).map(r=>{const p=STATUS_PILL[r.status]||STATUS_PILL.unknown;return `<tr><td>${esc(r.requirement)}</td><td><span class="pill ${p[0]}">${p[1]}</span></td><td>${esc(r.evidence||"")}</td></tr>`;}).join("");
+  $("kwMatched").innerHTML=(a.keywords_matched||[]).map(x=>`<span class="pill good">${esc(x)}</span>`).join("")||'<span class="muted">No matched phrases.</span>';
+  $("kwMissing").innerHTML=(a.keywords_missing||[]).map(x=>`<span class="pill bad">${esc(x)}</span>`).join("");
+  $("permitNote").textContent=a.permit_note||"";
+  const qs=a.questions||[];
+  $("questions").innerHTML=qs.map(q=>`<div class="q" data-qid="${esc(q.id)}"><p>${esc(q.question)}</p><small>Requirement: ${esc(q.requirement)}</small>
+    <div class="opts"><label><input type="radio" name="${esc(q.id)}" value="yes"> Yes</label><label><input type="radio" name="${esc(q.id)}" value="partly"> Partly</label><label><input type="radio" name="${esc(q.id)}" value="no"> No</label></div>
+    <textarea placeholder="If yes or partly: where, how often, for whom, any real figure. Leave empty to skip this one."></textarea></div>`).join("")||'<p class="muted">Every requirement already has evidence or a confirmed answer. Nothing to ask.</p>';
+  $("qPanel").classList.remove("hidden");$("outPanel").classList.add("hidden");
+  if(!quiet)$("qPanel").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function collectAnswers(){
+  const qs=(current.analysis&&current.analysis.questions)||[];
+  const out=[];
+  document.querySelectorAll("#questions .q").forEach(el=>{
+    const q=qs.find(x=>x.id===el.dataset.qid);if(!q)return;
+    const r=el.querySelector("input[type=radio]:checked");const t=el.querySelector("textarea").value.trim();
+    if(!r&&!t)return;
+    const choice=r?r.value:"yes";
+    if(choice==="no")out.push({id:uid("n"),kind:"no",q:q.requirement,a:t||"No",date:today(),ctx:current.role});
+    else out.push({id:uid("a"),kind:choice,q:q.question,a:(choice==="partly"?"Partly. ":"Yes. ")+t,date:today(),ctx:current.role});
+  });
+  return out;
+}
+
+async function build(skip){
+  if(!current.jd||!current.analysis){setStatus("s2","Run Check fit first.",true);return;}
+  $("build").disabled=true;$("skip").disabled=true;setStatus("s2","Starting…");saveDraft();
+  const fresh=skip?[]:collectAnswers();
+  const unanswered=(current.analysis.questions||[]).length-fresh.length;
+  if(fresh.length){state.answers.push(...fresh);renderFacts();persist();}
+  setStatus("s2","Writing the CV. One to two minutes. Your answers are saved.");
+  try{
+    const s=await ensureSample();
+    const lang=$("lang").value, wantLetter=$("wantLetter").checked, wantEmail=$("wantEmail").checked, recruiter=$("recruiter").value.trim();
+    const a=current.analysis;
+    const prev=state.applications.slice().reverse().find(x=>x.cv);
+    const prompt=`You write the CV of one candidate, Hamza Moumine, for one posting. Today is ${today()}. Output language: ${lang}.
+
+FACT BASE
+${factText()}
+
+${RULEBOOK}
+
+JOB POSTING
+${current.jd}
+
+EVIDENCE MAP FROM SCREENING
+Role: ${current.role}. Company: ${current.company||"unknown"}. Fit ${a.fit_pct}%.
+${(a.requirements||[]).map(r=>`- [${r.status}] ${r.requirement}${r.evidence?" :: "+r.evidence:""}`).join("\n")}
+Keywords supported by facts: ${(a.keywords_matched||[]).join(", ")}.
+Keywords NOT supported (never claim): ${(a.keywords_missing||[]).join(", ")}.
+${unanswered>0?unanswered+" screening question(s) were left unanswered: treat those requirements as unknown and make no claim about them.":""}
+${prev?"PREVIOUS APPROVED CV (for the change review only, do not copy wording that does not fit this posting):\n"+cvText(prev.cv).slice(0,6000):"No previous approved CV."}
+
+Write the tailored CV${wantLetter?", a cover letter":""}${wantEmail?", and an email to the recruiter"+(recruiter?" ("+recruiter+")":""):""} following every rule.
+
+Return ONLY a JSON object:
+{
+ "headline": "one line under the name: the kind of work he does, in words that fit the posting without claiming a title he never held",
+ "contact": "Bratislava, Slovakia | +421 911 656 406 | hmoumine@outlook.com | Work permit holder, Slovakia",
+ "summary": "3 to 4 sentences",
+ "experience": [{"title":"exact title from facts","company":"","location":"","dates":"Mon YYYY to Mon YYYY",
+    "bullets":[{"text":"the bullet","kind":"achievement"|"responsibility","support":"the fact line(s) it rests on, quoted or closely paraphrased","confidence":"verified"|"confirm"}]}],
+   confidence "confirm" when the bullet rests on a confirmed answer that is vague, or stretches a fact's wording, so Hamza should check it before sending.
+ "key_skills": [{"skill":"skill name, posting wording where true","line":"one line: where and with what result"}],
+ "skills": ["Tools and systems only: software, CRMs, standards, short items"],
+ "education": [{"degree":"","school":"","dates":""}],
+ "certificates": ["..."],
+ "languages": "one line",
+ "awards": ["..."],
+ "extra": "one optional line or empty string",
+ "cover_letter": "${wantLetter?"full text with greeting and sign-off":""}",
+ "email": "${wantEmail?"Subject: ... then the body":""}",
+ "review": {
+   "changes": [{"what":"what was emphasised, reordered, reworded or left out versus the plain facts${prev?" and the previous CV":""}","why":"how it serves this posting","support":"which fact or confirmed answer backs it"}],
+   "flags": ["anything Hamza must confirm before sending, one line each, empty list if none. Do not flag salary, the work permit or start date: those are settled in the facts"],
+   "left_out": ["posting requirements deliberately not addressed because the facts do not support them"]
+ }
+}
+No markdown. JSON only. Before answering, check: no banned words, no invented numbers, no title changed, no em dashes or semicolons, no two consecutive bullets with the same opening, every bullet has a support line.`;
+    const out=await s.json(prompt,{modelTier:"complex",cache:false,onText:p=>setStatus("s2","Writing… "+((p&&p.text)?p.text.length:0)+" characters so far")});
+    const cv=parseJson(out);
+    normaliseCv(cv);
+    current.cv=cv;current.letter=cv.cover_letter||"";current.email=cv.email||"";
+    renderOutput();saveDraft();
+    setStatus("s2","Draft ready below. Read the review first, then edit the CV tab and approve.");
+  }catch(e){setStatus("s2",friendly(e)+" Your answers are kept, press the button again.",true);}
+  finally{$("build").disabled=false;$("skip").disabled=false;}
+}
+function normaliseCv(cv){
+  (cv.experience||[]).forEach(j=>{j.bullets=(j.bullets||[]).map(b=>typeof b==="string"?{text:b,kind:"responsibility",support:"",confidence:"confirm"}:b);});
+  cv.review=cv.review||{changes:[],flags:[],left_out:[]};
+  cv.version=(cv.version||0);
+  cv.key_skills=Array.isArray(cv.key_skills)?cv.key_skills.filter(k=>k&&k.skill):[];
+  const thin=(cv.experience||[]).filter(j=>(j.bullets||[]).length<2).map(j=>j.title+", "+j.company);
+  if(thin.length)cv.review.flags=(cv.review.flags||[]).concat(["Fewer than 2 bullets: "+thin.join(" | ")+". Add a line in the CV tab or a fact in the facts panel."]);
+  const words=cvText(cv).split(/\s+/).length;
+  if(words>1000)cv.review.flags=(cv.review.flags||[]).concat([`About ${words} words, which runs past 2 pages. Press "Shorten to 2 pages" or delete bullets in the least relevant roles.`]);
+}
+
+/* ===================== OUTPUT: review, editable CV, text, letter, email ===================== */
+function renderOutput(quiet){
+  const cv=current.cv;if(!cv)return;
+  renderReview(cv);renderCv(cv);$("textView").textContent=cvText(cv);
+  $("letterView").value=current.letter;$("emailView").value=current.email;
+  document.querySelector('[data-tab="letter"]').classList.toggle("hidden",!current.letter);
+  document.querySelector('[data-tab="email"]').classList.toggle("hidden",!current.email);
+  $("copyLetter").classList.toggle("hidden",!current.letter);$("copyEmail").classList.toggle("hidden",!current.email);
+  if(!quiet)selectTab("review");
+  $("outPanel").classList.remove("hidden");if(!quiet)$("outPanel").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function renderReview(cv){
+  const r=cv.review||{};
+  const flags=(r.flags||[]).concat((cv.experience||[]).flatMap(j=>j.bullets.filter(b=>b.confidence==="confirm").map(b=>`Check before sending: "${b.text}"`)));
+  $("flags").innerHTML=flags.length?`<div class="flagbox"><b>Needs your confirmation</b><ul>${flags.map(f=>`<li>${esc(f)}</li>`).join("")}</ul></div>`:'<p class="muted">Nothing flagged. Every line rests on a verified fact.</p>';
+  let h=(r.changes||[]).map(c=>`<div class="change"><b>${esc(c.what)}</b>${esc(c.why)}<small>Backed by: ${esc(c.support)}</small></div>`).join("");
+  if(r.left_out&&r.left_out.length)h+=`<div class="change"><b>Left out on purpose</b>${r.left_out.map(esc).join(" · ")}<small>The facts do not support these. Answer the questions above if any is wrong.</small></div>`;
+  $("changes").innerHTML=h||'<p class="muted">No change notes returned.</p>';
+  $("support").innerHTML=(cv.experience||[]).map(j=>j.bullets.map(b=>`<div><span class="b">${esc(b.text)}</span> <span class="pill ${b.kind==="achievement"?"good":"grey"}">${esc(b.kind)}</span>${b.confidence==="confirm"?'<span class="pill warn">confirm</span>':""}<br><span class="s">${esc(j.company)}: ${esc(b.support||"no support line given")}</span></div>`).join("")).join("");
+}
+function expGroups(cv){
+  const ex=(cv.experience||[]).map((j,i)=>({j,i}));
+  const isTech=x=>/stmicro/i.test(x.j.company||"");
+  const sales={title:"Sales and account management experience",jobs:ex.filter(x=>!isTech(x))};
+  const tech={title:"Technical and operations experience",jobs:ex.filter(isTech)};
+  const techFirst=ex.length&&isTech(ex[0]);
+  return (techFirst?[tech,sales]:[sales,tech]).filter(g=>g.jobs.length);
+}
+function ed(path,text,tag="span",cls=""){return `<${tag} contenteditable="true" data-path="${path}" class="${cls}">${esc(text)}</${tag}>`;}
+function renderCv(cv){
+  const photo=$("wantPhoto").checked;
+  let h=`<div style="display:flex;justify-content:space-between;gap:16px"><div><h3>HAMZA MOUMINE</h3><p class="head">${ed("headline",cv.headline)}</p><p class="contact">${ed("contact",cv.contact)}</p></div>${photo?'<div style="width:96px;height:120px;border:1px dashed #999;flex:none;font-size:11px;color:#777;display:grid;place-items:center">photo</div>':""}</div>`;
+  h+=`<h4>Summary</h4><p>${ed("summary",cv.summary)}</p>`;
+  if(cv.key_skills&&cv.key_skills.length)h+=`<h4>Key skills</h4><ul>${cv.key_skills.map((k,i)=>`<li><b>${ed(`key_skills.${i}.skill`,k.skill)}:</b> ${ed(`key_skills.${i}.line`,k.line)}</li>`).join("")}</ul>`;
+  h+=expGroups(cv).map(g=>`<h4>${g.title}</h4>`+g.jobs.map(({j,i:ji})=>`<div class="job"><b>${esc(j.title)}</b><span>${esc(j.dates)}</span></div><p class="org">${esc(j.company)}${j.location?", "+esc(j.location):""}</p><ul>${j.bullets.map((b,bi)=>ed(`experience.${ji}.bullets.${bi}.text`,b.text,"li",b.confidence==="confirm"?"flag":"")).join("")}</ul>`).join("")).join("");
+  if(cv.skills&&cv.skills.length)h+=`<h4>Tools and systems</h4><p>${ed("skills",cv.skills.join(" · "))}</p>`;
+  h+=`<h4>Education</h4>`+(cv.education||[]).map(e=>`<p><b>${esc(e.degree)}</b>, ${esc(e.school)}${e.dates?" ("+esc(e.dates)+")":""}</p>`).join("");
+  if(cv.certificates&&cv.certificates.length)h+=`<h4>Certificates</h4><ul>${cv.certificates.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>`;
+  h+=`<h4>Languages</h4><p>${ed("languages",cv.languages)}</p>`;
+  if(cv.awards&&cv.awards.length)h+=`<h4>Awards</h4><ul>${cv.awards.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>`;
+  if(cv.extra)h+=`<h4>Additional</h4><p>${ed("extra",cv.extra)}</p>`;
+  $("cvView").innerHTML=h;
+  $("cvView").querySelectorAll("[contenteditable]").forEach(el=>{
+    el.addEventListener("input",()=>{setPath(current.cv,el.dataset.path,el.textContent);$("textView").textContent=cvText(current.cv);saveDraft();});
+    el.addEventListener("keydown",ev=>{if(ev.key==="Enter"){ev.preventDefault();el.blur();}});
+  });
+}
+function setPath(obj,path,val){
+  const parts=path.split(".");let o=obj;
+  for(let i=0;i<parts.length-1;i++)o=o[parts[i]];
+  const last=parts[parts.length-1];
+  if(path==="skills")obj.skills=val.split("·").map(s=>s.trim()).filter(Boolean);
+  else o[last]=val;
+}
+$("letterView").addEventListener("input",()=>{current.letter=$("letterView").value;saveDraft();});
+$("emailView").addEventListener("input",()=>{current.email=$("emailView").value;saveDraft();});
+function selectTab(name){
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===name?"true":"false"));
+  ["review","cv","text","letter","email"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==name));
+}
+function cvText(cv){
+  const L=[];L.push("HAMZA MOUMINE",cv.headline,cv.contact,"","SUMMARY",cv.summary,"");
+  if(cv.key_skills&&cv.key_skills.length){L.push("KEY SKILLS");cv.key_skills.forEach(k=>L.push(`- ${k.skill}: ${k.line}`));L.push("");}
+  expGroups(cv).forEach(g=>{L.push(g.title.toUpperCase());
+  g.jobs.forEach(({j})=>{L.push(`${j.title} | ${j.company}${j.location?", "+j.location:""} | ${j.dates}`);(j.bullets||[]).forEach(b=>L.push("- "+(b.text!=null?b.text:b)));L.push("");});});
+  if(cv.skills&&cv.skills.length)L.push("TOOLS AND SYSTEMS",cv.skills.join(", "),"");
+  L.push("EDUCATION");(cv.education||[]).forEach(e=>L.push(`${e.degree}, ${e.school}${e.dates?" ("+e.dates+")":""}`));L.push("");
+  if(cv.certificates&&cv.certificates.length){L.push("CERTIFICATES");cv.certificates.forEach(c=>L.push("- "+c));L.push("");}
+  L.push("LANGUAGES",cv.languages,"");
+  if(cv.awards&&cv.awards.length){L.push("AWARDS");cv.awards.forEach(c=>L.push("- "+c));L.push("");}
+  if(cv.extra)L.push("ADDITIONAL",cv.extra);
+  return L.join("\n");
+}
+function approve(){
+  if(!current.cv)return;
+  const existing=state.applications.find(a=>a.runId===(current.analysis&&current.analysis.runId));
+  const rec={id:existing?existing.id:uid("app"),runId:current.analysis?current.analysis.runId:null,date:today(),role:current.role,company:current.company,pct:current.analysis?current.analysis.fit_pct:null,
+    status:existing?existing.status:"draft",version:(existing?existing.version:0)+1,cv:JSON.parse(JSON.stringify(current.cv)),cvText:cvText(current.cv),letter:current.letter,email:current.email,jd:current.jd,analysis:current.analysis,lang:$("lang").value};
+  if(existing)Object.assign(existing,rec);else state.applications.push(rec);
+  persist();renderApps();
+  setStatus("s3",`Approved and saved as version ${rec.version}. Download it below, then set the status in Applications once you have applied.`);
+}
+
+/* ===================== DOCX (minimal, no library) ===================== */
+const CRC_T=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+function crc32(u8){let c=0xFFFFFFFF;for(let i=0;i<u8.length;i++)c=CRC_T[(c^u8[i])&0xFF]^(c>>>8);return (c^0xFFFFFFFF)>>>0;}
+function zipStore(files){
+  const enc=new TextEncoder();const parts=[];const central=[];let offset=0;
+  const u16=n=>[n&255,(n>>8)&255], u32=n=>[n&255,(n>>8)&255,(n>>16)&255,(n>>>24)&255];
+  for(const f of files){
+    const name=enc.encode(f.name), data=enc.encode(f.data), crc=crc32(data);
+    const local=new Uint8Array([0x50,0x4b,3,4,...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...name]);
+    parts.push(local,data);
+    central.push(new Uint8Array([0x50,0x4b,1,2,...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset),...name]));
+    offset+=local.length+data.length;
+  }
+  const cdStart=offset;let cdLen=0;central.forEach(c=>{parts.push(c);cdLen+=c.length;});
+  parts.push(new Uint8Array([0x50,0x4b,5,6,...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(cdLen),...u32(cdStart),...u16(0)]));
+  return new Blob(parts,{type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+}
+const xe=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function para(text,o={}){
+  const pPr=[];if(o.style)pPr.push(`<w:pStyle w:val="${o.style}"/>`);
+  if(o.bullet)pPr.push(`<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr>`);
+  if(o.after!=null)pPr.push(`<w:spacing w:after="${o.after}"/>`);
+  if(o.tabRight)pPr.push(`<w:tabs><w:tab w:val="right" w:pos="9360"/></w:tabs>`);
+  const rPr=`${o.bold?"<w:b/>":""}${o.size?`<w:sz w:val="${o.size}"/>`:""}${o.color?`<w:color w:val="${o.color}"/>`:""}`;
+  const runs=(Array.isArray(text)?text:[text]).map(t=>t==="\t"?`<w:r><w:tab/></w:r>`:`<w:r><w:rPr>${rPr}</w:rPr><w:t xml:space="preserve">${xe(t)}</w:t></w:r>`).join("");
+  return `<w:p><w:pPr>${pPr.join("")}</w:pPr>${runs}</w:p>`;
+}
+function boldLead(lead,rest){return `<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr><w:spacing w:after="20"/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t xml:space="preserve">${xe(lead)}</w:t></w:r><w:r><w:t xml:space="preserve">${xe(rest)}</w:t></w:r></w:p>`;}
+function docxFromCv(cv){
+  const B=[];
+  B.push(para("HAMZA MOUMINE",{bold:true,size:32,after:0}));
+  B.push(para(cv.headline,{size:22,after:0}));
+  B.push(para(cv.contact,{size:20,color:"444444",after:160}));
+  const H=t=>B.push(para(t.toUpperCase(),{style:"Heading2",bold:true,size:21,after:60}));
+  H("Summary");B.push(para(cv.summary,{after:120}));
+  if(cv.key_skills&&cv.key_skills.length){H("Key skills");cv.key_skills.forEach(k=>B.push(boldLead(k.skill+": ",k.line)));}
+  expGroups(cv).forEach(g=>{H(g.title);
+  g.jobs.forEach(({j})=>{
+    B.push(para([j.title,"\t",j.dates],{bold:true,size:22,after:0,tabRight:true}));
+    B.push(para(`${j.company}${j.location?", "+j.location:""}`,{size:20,color:"333333",after:40}));
+    (j.bullets||[]).forEach(b=>B.push(para(b.text!=null?b.text:b,{bullet:true,after:20})));
+    B.push(para("",{after:60}));
+  });});
+  if(cv.skills&&cv.skills.length){H("Tools and systems");B.push(para(cv.skills.join(" · "),{after:120}));}
+  H("Education");(cv.education||[]).forEach(e=>B.push(para(`${e.degree}, ${e.school}${e.dates?" ("+e.dates+")":""}`,{after:40})));
+  if(cv.certificates&&cv.certificates.length){H("Certificates");cv.certificates.forEach(c=>B.push(para(c,{bullet:true,after:20})));}
+  H("Languages");B.push(para(cv.languages,{after:120}));
+  if(cv.awards&&cv.awards.length){H("Awards");cv.awards.forEach(c=>B.push(para(c,{bullet:true,after:20})));}
+  if(cv.extra){H("Additional");B.push(para(cv.extra,{after:0}));}
+  const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${B.join("")}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="850" w:right="950" w:bottom="850" w:left="950" w:header="500" w:footer="500" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/><w:sz w:val="20"/><w:lang w:val="en-GB"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="40" w:line="247" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>
+<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>
+<w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="160" w:after="40"/><w:pBdr><w:bottom w:val="single" w:sz="4" w:space="1" w:color="888888"/></w:pBdr></w:pPr><w:rPr><w:b/><w:sz w:val="21"/></w:rPr></w:style>
+</w:styles>`;
+  const numbering=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:abstractNum w:abstractNumId="0"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val="•"/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="360" w:hanging="220"/></w:pPr><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/></w:rPr></w:lvl></w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num></w:numbering>`;
+  const ct=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/></Types>`;
+  const rels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
+  const drels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/></Relationships>`;
+  return zipStore([{name:"[Content_Types].xml",data:ct},{name:"_rels/.rels",data:rels},{name:"word/document.xml",data:doc},{name:"word/styles.xml",data:styles},{name:"word/numbering.xml",data:numbering},{name:"word/_rels/document.xml.rels",data:drels}]);
+}
+function fileStem(role,company){const r=(role||current.role||"CV").replace(/[^\w]+/g,"_").slice(0,40);const c=(company!=null?company:current.company||"").replace(/[^\w]+/g,"_").slice(0,30);return `Hamza_Moumine_CV_${c?c+"_":""}${r}`;}
+async function save(filename,data){
+  if(!downloads)downloads=await claude.use("downloads");
+  if(!downloads){setStatus("s3","Downloads are not available in this view. Use Copy instead.",true);return;}
+  try{await downloads.save({filename,data});setStatus("s3","Saved "+filename);}
+  catch(e){setStatus("s3",e.code==="declined"?"Download cancelled.":("Could not save: "+(e.message||e.code)),e.code!=="declined");}
+}
+async function copy(text,label){
+  try{await navigator.clipboard.writeText(text);setStatus("s3",label+" copied.");}
+  catch(e){setStatus("s3","Copy was blocked here. Select the text and copy it by hand.",true);}
+}
+
+/* ===================== FACTS EDITOR ===================== */
+let factsTimer=null;
+function factsChanged(msg){
+  state.facts.rev=Date.now();
+  clearTimeout(factsTimer);
+  factsTimer=setTimeout(()=>{persist();renderFacts();setStatus("sFacts",msg||"Saved.");},500);
+}
+function grow(t){t.style.height="auto";t.style.height=(t.scrollHeight+2)+"px";}
+function renderFactsEditor(){
+  const f=ensureFacts();const q=($("factSearch").value||"").trim().toLowerCase();
+  const ed=$("factsEditor");
+  ed.innerHTML=f.sections.map(sec=>{
+    const lines=sec.lines.filter(l=>!q||l.text.toLowerCase().includes(q)||sec.title.toLowerCase().includes(q));
+    if(q&&!lines.length)return "";
+    return `<div class="fsec" data-sid="${sec.id}"><div class="shead"><textarea class="ftitle" rows="1" data-title="${sec.id}" aria-label="Section title">${esc(sec.title)}</textarea><button data-delsec="${sec.id}" title="Delete section">Delete section</button></div>
+      ${lines.map(l=>`<div class="fline${l.edited?" changed":""}"><textarea rows="1" data-line="${l.id}" aria-label="Fact line">${esc(l.text)}</textarea><button data-del="${l.id}" title="Delete this line">Delete</button></div>`).join("")}
+      <button class="small" data-addline="${sec.id}" style="margin:6px 0 0 20px">Add a line</button></div>`;
+  }).join("")||'<p class="muted">No line matches.</p>';
+  ed.querySelectorAll("textarea").forEach(grow);
+  const d=f.deleted||[];$("delCount").textContent=d.length;
+  $("deletedView").innerHTML=d.length?d.slice().reverse().map((x,i)=>`<div class="q"><p>${esc(x.text)}</p><small>From: ${esc((x.section||"").split("\n")[0])} · deleted ${esc(x.date)}</small> <button class="small" data-restore="${d.length-1-i}">Restore</button></div>`).join(""):"Nothing deleted.";
+}
+function findLine(id){for(const s of state.facts.sections){const l=s.lines.find(x=>x.id===id);if(l)return [s,l];}return [null,null];}
+$("factsEditor").addEventListener("input",ev=>{
+  const t=ev.target;if(t.tagName!=="TEXTAREA")return;grow(t);
+  if(t.dataset.line){const [,l]=findLine(t.dataset.line);if(l){l.text=t.value;l.edited=today();}factsChanged();}
+  else if(t.dataset.title){const s=state.facts.sections.find(x=>x.id===t.dataset.title);if(s){s.title=t.value;}factsChanged();}
+});
+$("factsEditor").addEventListener("keydown",ev=>{
+  const t=ev.target;
+  if(t.dataset&&t.dataset.line&&ev.key==="Enter"&&!ev.shiftKey){ev.preventDefault();const [s,l]=findLine(t.dataset.line);const nl={id:uid("l"),text:"",edited:today()};s.lines.splice(s.lines.indexOf(l)+1,0,nl);renderFactsEditor();const n=document.querySelector(`[data-line="${nl.id}"]`);n&&n.focus();}
+});
+$("factsEditor").addEventListener("click",ev=>{
+  const b=ev.target.closest("button");if(!b)return;
+  if(b.dataset.del){const [s,l]=findLine(b.dataset.del);if(!l)return;s.lines.splice(s.lines.indexOf(l),1);if(l.text.trim())(state.facts.deleted=state.facts.deleted||[]).push({text:l.text,section:s.title,sid:s.id,date:today()});renderFactsEditor();factsChanged("Line deleted. You can restore it under Deleted lines.");}
+  else if(b.dataset.addline){const s=state.facts.sections.find(x=>x.id===b.dataset.addline);const nl={id:uid("l"),text:"",edited:today()};s.lines.push(nl);renderFactsEditor();const n=document.querySelector(`[data-line="${nl.id}"]`);n&&n.focus();}
+  else if(b.dataset.delsec){const s=state.facts.sections.find(x=>x.id===b.dataset.delsec);if(!s)return;
+    if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Click again to delete "+s.lines.length+" lines";setTimeout(()=>{b.dataset.armed="";b.textContent="Delete section";},4000);return;}
+    s.lines.forEach(l=>{if(l.text.trim())(state.facts.deleted=state.facts.deleted||[]).push({text:l.text,section:s.title,sid:s.id,date:today()});});
+    state.facts.sections=state.facts.sections.filter(x=>x!==s);renderFactsEditor();factsChanged("Section deleted. Its lines are under Deleted lines.");}
+});
+$("deletedView").addEventListener("click",ev=>{
+  const b=ev.target.closest("[data-restore]");if(!b)return;const i=+b.dataset.restore;const x=state.facts.deleted[i];if(!x)return;
+  let s=state.facts.sections.find(y=>y.id===x.sid);
+  if(!s){s={id:x.sid||uid("s"),title:x.section||"Restored",lines:[]};state.facts.sections.push(s);}
+  s.lines.push({id:uid("l"),text:x.text,edited:today()});state.facts.deleted.splice(i,1);renderFactsEditor();factsChanged("Restored.");
+});
+$("addSection").onclick=()=>{const s={id:uid("s"),title:"NEW SECTION (for example a job: COMPANY, City. Title. Mon YYYY to Mon YYYY.)",lines:[{id:uid("l"),text:"",edited:today()}]};state.facts.sections.push(s);$("factSearch").value="";renderFactsEditor();factsChanged();const t=document.querySelector(`[data-title="${s.id}"]`);t&&(t.focus(),t.select());};
+$("factSearch").addEventListener("input",renderFactsEditor);
+$("openFacts").onclick=()=>{ensureFacts();$("factsPanel").classList.remove("hidden");renderFactsEditor();$("factsPanel").scrollIntoView({behavior:"smooth",block:"start"});};
+$("closeFacts").onclick=()=>$("factsPanel").classList.add("hidden");
+$("showFactText").onclick=()=>{const v=$("factView");v.classList.toggle("hidden");$("showFactText").textContent=v.classList.contains("hidden")?"Show exactly what Claude reads":"Hide";};
+
+/* ===================== WIRING ===================== */
+$("analyse").onclick=analyse;
+$("clear").onclick=()=>{["jd","company","role","recruiter"].forEach(i=>$(i).value="");resetCurrent();try{localStorage.removeItem("jobfit-draft");}catch(e){}$("fitBody").classList.add("hidden");$("fitEmpty").classList.remove("hidden");$("qPanel").classList.add("hidden");$("outPanel").classList.add("hidden");setStatus("s1","Ready for a new posting. Facts and applications are kept.");};
+$("build").onclick=()=>build(false);
+$("skip").onclick=()=>build(true);
+$("rebuild").onclick=()=>{$("qPanel").scrollIntoView({behavior:"smooth"});setStatus("s2","Change or add answers, then press Write the CV again.");};
+$("approve").onclick=approve;
+$("shorten").onclick=async()=>{
+  if(!current.cv)return;const before=cvText(current.cv).split(/\s+/).length;
+  $("shorten").disabled=true;setStatus("s3",`Shortening from about ${before} words…`);
+  try{
+    const s=await ensureSample();
+    const prompt=`Shorten this CV to at most 830 words in total so it fits 2 A4 pages. Return the same JSON shape, nothing else.
+Rules: keep every role and its title, company and dates. Every role keeps at least 2 bullets. Cut first from the roles least relevant to the posting, then cut words inside long bullets. Key skills: keep 5. Keep all numbers that stay, unchanged. Do not add anything new. Do not change meaning. No em dashes or semicolons. Keep each bullet's kind, support and confidence fields as they are.
+In review.changes add one entry describing what you cut.
+
+POSTING (for relevance only):
+${(current.jd||"").slice(0,3000)}
+
+CV JSON:
+${JSON.stringify(current.cv)}`;
+    const out=await s.json(prompt,{modelTier:"default",cache:false,onText:p=>setStatus("s3","Shortening… "+((p&&p.text)?p.text.length:0)+" characters")});
+    const cv=parseJson(out);cv.review=cv.review||current.cv.review;cv.review.flags=(cv.review.flags||[]).filter(f=>!/words, which runs past 2 pages/.test(f));
+    normaliseCv(cv);current.cv=cv;renderOutput(true);saveDraft();
+    setStatus("s3",`Now about ${cvText(cv).split(/\s+/).length} words. Check the review tab for what was cut.`);
+  }catch(e){setStatus("s3",friendly(e)+" Your current CV is unchanged.",true);}
+  finally{$("shorten").disabled=false;}
+};
+$("dlDocx").onclick=()=>current.cv&&save(fileStem()+".docx",docxFromCv(current.cv));
+$("dlTxt").onclick=()=>current.cv&&save(fileStem()+".txt",cvText(current.cv));
+$("copyCv").onclick=()=>current.cv&&copy(cvText(current.cv),"CV text");
+$("copyLetter").onclick=()=>copy(current.letter,"Cover letter");
+$("copyEmail").onclick=()=>copy(current.email,"Email");
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>selectTab(b.dataset.tab));
+$("addFact").onclick=()=>$("addFactBox").classList.toggle("hidden");
+$("saveFact").onclick=()=>{const v=$("newFact").value.trim();if(!v)return;state.answers.push({id:uid("m"),kind:"yes",q:"",a:v,date:today()});$("newFact").value="";$("addFactBox").classList.add("hidden");renderFacts();persist();};
+let voiceTimer=null;$("voice").addEventListener("input",()=>{clearTimeout(voiceTimer);voiceTimer=setTimeout(()=>{state.voice=$("voice").value.trim();state.voiceRev=Date.now();persist();setStatus("sVoice","Saved.");setTimeout(()=>setStatus("sVoice",""),1500);},600);});
+$("exportAll").onclick=()=>save("hamza-jobfit-backup-"+today()+".json",JSON.stringify({exported:new Date().toISOString(),state,draft:(()=>{try{return JSON.parse(localStorage.getItem("jobfit-draft")||"null");}catch(e){return null;}})()},null,2));
+$("importBtn").onclick=()=>$("importFile").click();
+$("importFile").addEventListener("change",ev=>{const f=ev.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const d=JSON.parse(rd.result);const s=d.state||d;mergeState(s);renderFacts();renderApps();persist();setStatus("sApps","Backup merged: nothing was overwritten, missing items were added.");}catch(e){setStatus("sApps","That file is not a backup from this page.",true);}};rd.readAsText(f);ev.target.value="";});
+load();
+</script>
+</body>
+</html>
